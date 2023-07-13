@@ -1,12 +1,14 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAbstractItemView, QWidget, QHBoxLayout, QSpacerItem, \
-    QSizePolicy, QVBoxLayout, QLabel
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QAbstractItemView, QWidget, QHBoxLayout, QVBoxLayout
 from PyQt5.QtWidgets import QListWidget
 
 from svgButton import SvgButton
 
 
 class PromptLv2Widget(QWidget):
+    added = pyqtSignal()
+    deleted = pyqtSignal()
+
     def __init__(self):
         super(PromptLv2Widget, self).__init__()
         self.__initUi()
@@ -41,13 +43,11 @@ class PromptLv2Widget(QWidget):
         lay.setContentsMargins(0, 0, 0, 0)
         self.setLayout(lay)
 
-        lay = QVBoxLayout()
-
     def getListWidget(self):
         return self.__listWidget
 
     def __addClicked(self):
-        print('add')
+        self.added.emit()
 
     def __deleteClicked(self):
-        print('delete')
+        self.deleted.emit()

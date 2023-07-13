@@ -23,6 +23,8 @@ class PromptWidget(QWidget):
         self.__prompt = QTextEdit()
 
         self.__promptLv2Widget = PromptLv2Widget()
+        self.__promptLv2Widget.added.connect(self.__lv2Added)
+        self.__promptLv2Widget.deleted.connect(self.__lv2Deleted)
         self.__listWidget2 = self.__promptLv2Widget.getListWidget()
 
         self.__promptLv1Widget = PromptLv1Widget()
@@ -90,7 +92,28 @@ class PromptWidget(QWidget):
             self.__listWidget1.addItem(QListWidgetItem(new_attr))
             self.__promptBuilder.PROMPT_DICT[new_attr] = []
     def __lv1Deleted(self):
+        lv1_attrs = [self.__listWidget1.item(i).text() for i in self.__listWidget1.getCheckedRows()]
         self.__listWidget1.removeCheckedRows()
+        for lv1_attr in lv1_attrs:
+            del self.__promptBuilder.PROMPT_DICT[lv1_attr]
+
+    def __lv2Added(self):
+        dialog = InputDialog(title='New')
+        reply = dialog.exec()
+        if reply == QDialog.Accepted:
+            new_attr = dialog.getText()
+            lv1_item = self.__listWidget1.currentItem()
+            if lv1_item:
+                self.__listWidget2.addItem(QListWidgetItem(new_attr))
+                self.__promptBuilder.PROMPT_DICT[lv1_item.text()].append(new_attr)
+
+    def __lv2Deleted(self):
+        lv2_cur_row = self.__listWidget2.currentRow()
+        if lv2_cur_row != -1:
+            lv2_item = self.__listWidget2.takeItem(lv2_cur_row)
+            lv1_item = self.__listWidget1.currentItem()
+            if lv1_item:
+                self.__promptBuilder.PROMPT_DICT[lv1_item.text()].remove(lv2_item.text())
 
     def __shuffle(self):
         self.__generatePrompt(None, None)
