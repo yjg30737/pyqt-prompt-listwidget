@@ -41,12 +41,23 @@ class PromptBuilder:
 
     def __initVal(self):
         self.__current_prompt_dict = {}
+        self.__weight = False
+
+    def set_weight(self, f):
+        self.__weight = f
 
     def generate_random_prompt(self, arr):
-        if len(arr) > 0:
-            max_len = max(map(lambda x: len(x), arr))
-            weights = [i for i in range(max_len, 0, -1)]
-            random_prompt = ', '.join(list(filter(lambda x: x != '', [random.choices(_, weights[:len(_)])[0] for _ in arr])))
+        if self.__weight:
+            if len(arr) > 0:
+                max_len = max(map(lambda x: len(x), arr))
+                weights = [i for i in range(max_len, 0, -1)]
+                print(random.choices(arr)[0])
+                random_prompt = ', '.join(list(filter(lambda x: x != '', [random.choices(_, weights[:len(_)])[0] for _ in arr])))
+            else:
+                random_prompt = ''
         else:
-            random_prompt = ''
+            if len(arr) > 0:
+                random_prompt = ', '.join(list(filter(lambda x: x != '', [random.choices(_)[0] for _ in arr])))
+            else:
+                random_prompt = ''
         return random_prompt

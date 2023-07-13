@@ -1,8 +1,8 @@
-from PyQt5.QtWidgets import QAbstractItemView, QWidget, QHBoxLayout, \
-    QVBoxLayout, QApplication, QListWidget, \
-    QCheckBox, QTextEdit, QPushButton, QGroupBox, QFrame
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, \
+    QVBoxLayout, QApplication, QTextEdit, QPushButton, QCheckBox
 
-from check_listwidget import CheckBoxListWidget
+from promptLv1Widget import PromptLv1Widget
+from promptLv2Widget import PromptLv2Widget
 from script import PromptBuilder
 
 
@@ -16,27 +16,25 @@ class PromptWidget(QWidget):
         self.__promptBuilder = PromptBuilder()
 
     def __initUi(self):
+        self.__weightCheckBox = QCheckBox('Apply Weight in Randomizer')
+        self.__weightCheckBox.toggled.connect(self.__promptBuilder.set_weight)
+
         self.__prompt = QTextEdit()
 
-        allCheckBox = QCheckBox('Check all')
+        self.__promptLv2Widget = PromptLv2Widget()
+        self.__listWidget2 = self.__promptLv2Widget.getListWidget()
 
-        self.__listWidget1 = CheckBoxListWidget()
-        self.__listWidget1.setDragDropMode(QAbstractItemView.InternalMove)
-
-        self.__listWidget2 = QListWidget()
-
+        self.__promptLv1Widget = PromptLv1Widget()
+        self.__listWidget1 = self.__promptLv1Widget.getListWidget()
         self.__listWidget1.addItems(PromptBuilder.PROMPT_DICT.keys())
         self.__listWidget1.currentRowChanged.connect(self.__currentRowChanged)
         self.__listWidget1.setCurrentRow(0)
         self.__listWidget1.checkedSignal.connect(self.__generatePrompt)
 
-        allCheckBox.stateChanged.connect(self.__listWidget1.toggleState)
-
         lay = QHBoxLayout()
-        lay.addWidget(self.__listWidget1)
-        lay.addWidget(self.__listWidget2)
+        lay.addWidget(self.__promptLv1Widget)
+        lay.addWidget(self.__promptLv2Widget)
         lay.setContentsMargins(0, 0, 0, 0)
-        lay.setSpacing(0)
 
         topWidget = QWidget()
         topWidget.setLayout(lay)
@@ -54,7 +52,7 @@ class PromptWidget(QWidget):
         bottomWidget.setLayout(lay)
 
         lay = QVBoxLayout()
-        lay.addWidget(allCheckBox)
+        lay.addWidget(self.__weightCheckBox)
         lay.addWidget(topWidget)
         lay.addWidget(controlWidget)
         lay.addWidget(bottomWidget)
@@ -65,12 +63,6 @@ class PromptWidget(QWidget):
         self.__listWidget2.clear()
         self.__listWidget2.addItems(PromptBuilder.PROMPT_DICT[self.__listWidget1.item(r).text()])
         self.__listWidget2.setCurrentRow(0)
-
-    def __addClicked(self):
-        print('add')
-
-    def __deleteClicked(self):
-        print('delete')
 
     def __generatePrompt(self, i, state):
         rows1 = self.__listWidget1.getCheckedRows()

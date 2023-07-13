@@ -14,6 +14,7 @@ setup(
     author_email='yjg30737@gmail.com',
     license='MIT',
     packages=find_packages(),
+    package_data={'src.ico': ['add.svg', 'delete.svg']},
     description='PyQt prompt generator widget for stable diffusion with 2 QListWidget',
     url='https://github.com/yjg30737/pyqt-prompt-listwidget.git',
     long_description_content_type='text/markdown',
