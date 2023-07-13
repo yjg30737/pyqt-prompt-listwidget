@@ -1,4 +1,4 @@
-import random
+import random, string
 
 # things to add
 # interaction
@@ -51,13 +51,17 @@ class PromptBuilder:
             if len(arr) > 0:
                 max_len = max(map(lambda x: len(x), arr))
                 weights = [i for i in range(max_len, 0, -1)]
-                print(random.choices(arr)[0])
-                random_prompt = ', '.join(list(filter(lambda x: x != '', [random.choices(_, weights[:len(_)])[0] for _ in arr])))
+                random_prompt = ', '.join(list(filter(lambda x: x != '', [random.choices(_, weights[:len(_)])[0] for _ in arr if len(_) > 0])))
             else:
                 random_prompt = ''
         else:
             if len(arr) > 0:
-                random_prompt = ', '.join(list(filter(lambda x: x != '', [random.choices(_)[0] for _ in arr])))
+                random_prompt = ', '.join(list(filter(lambda x: x != '', [random.choices(_)[0] for _ in arr if len(_) > 0])))
             else:
                 random_prompt = ''
         return random_prompt
+
+
+def generate_random_string(length):
+    letters = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters) for _ in range(length))

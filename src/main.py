@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, \
-    QVBoxLayout, QApplication, QTextEdit, QPushButton, QCheckBox
+    QVBoxLayout, QApplication, QTextEdit, QPushButton, QCheckBox, QDialog, QListWidgetItem
 
 from promptLv1Widget import PromptLv1Widget
 from promptLv2Widget import PromptLv2Widget
 from script import PromptBuilder
+from inputDialog import InputDialog
 
 
 class PromptWidget(QWidget):
@@ -25,11 +26,15 @@ class PromptWidget(QWidget):
         self.__listWidget2 = self.__promptLv2Widget.getListWidget()
 
         self.__promptLv1Widget = PromptLv1Widget()
+
         self.__listWidget1 = self.__promptLv1Widget.getListWidget()
         self.__listWidget1.addItems(PromptBuilder.PROMPT_DICT.keys())
         self.__listWidget1.currentRowChanged.connect(self.__currentRowChanged)
         self.__listWidget1.setCurrentRow(0)
         self.__listWidget1.checkedSignal.connect(self.__generatePrompt)
+
+        self.__promptLv1Widget.added.connect(self.__lv1Added)
+        self.__promptLv1Widget.deleted.connect(self.__lv1Deleted)
 
         lay = QHBoxLayout()
         lay.addWidget(self.__promptLv1Widget)
@@ -61,17 +66,31 @@ class PromptWidget(QWidget):
 
     def __currentRowChanged(self, r):
         self.__listWidget2.clear()
-        self.__listWidget2.addItems(PromptBuilder.PROMPT_DICT[self.__listWidget1.item(r).text()])
-        self.__listWidget2.setCurrentRow(0)
+        item = self.__listWidget1.item(r)
+        if item:
+            self.__listWidget2.addItems(PromptBuilder.PROMPT_DICT[item.text()])
+            self.__listWidget2.setCurrentRow(0)
 
     def __generatePrompt(self, i, state):
         rows1 = self.__listWidget1.getCheckedRows()
         rand_arr = []
         for i in rows1:
-            values = PromptBuilder.PROMPT_DICT[self.__listWidget1.item(i).text()]
-            rand_arr.append(values)
+            item = self.__listWidget1.item(i)
+            if item:
+                values = PromptBuilder.PROMPT_DICT[item.text()]
+                rand_arr.append(values)
 
         self.__prompt.setText(self.__promptBuilder.generate_random_prompt(rand_arr))
+
+    def __lv1Added(self):
+        dialog = InputDialog(title='New')
+        reply = dialog.exec()
+        if reply == QDialog.Accepted:
+            new_attr = dialog.getText()
+            self.__listWidget1.addItem(QListWidgetItem(new_attr))
+            self.__promptBuilder.PROMPT_DICT[new_attr] = []
+    def __lv1Deleted(self):
+        self.__listWidget1.removeCheckedRows()
 
     def __shuffle(self):
         self.__generatePrompt(None, None)

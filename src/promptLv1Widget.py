@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QHBoxLayout, QLabel, QSpacerItem, \
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QHBoxLayout, QSpacerItem, \
     QSizePolicy, QVBoxLayout
 
 from check_listwidget import CheckBoxListWidget
@@ -7,6 +7,9 @@ from svgButton import SvgButton
 
 
 class PromptLv1Widget(QWidget):
+    added = pyqtSignal()
+    deleted = pyqtSignal()
+
     def __init__(self):
         super(PromptLv1Widget, self).__init__()
         self.__initUi()
@@ -51,7 +54,7 @@ class PromptLv1Widget(QWidget):
         return self.__listWidget
 
     def __addClicked(self):
-        print('add')
+        self.added.emit()
 
     def __deleteClicked(self):
-        print('delete')
+        self.deleted.emit()
